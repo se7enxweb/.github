@@ -2,7 +2,7 @@
 
 **North American stewards of Exponential Platform — the PHP CMS that refused to die.**
 
-[se7enx.com](https://se7enx.com) · [exponential.earth](https://exponential.earth) · [mirror.ezpublish.se7enx.com](https://mirror.ezpublish.se7enx.com)
+[se7enx.com](https://se7enx.com) · [exponential.earth](https://exponential.earth) · [share.exponential.earth](https://share.exponential.earth) · [platform.exponential.earth](https://platform.exponential.earth) · [mirror.exponential.se7enx.com](https://mirror.exponential.se7enx.com) · [api.exponential.earth](https://api.exponential.earth)
 
 ---
 
