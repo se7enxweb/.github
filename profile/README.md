@@ -6,6 +6,129 @@
 
 ---
 
+## Who are you? Find your path.
+
+New here? Everything on this page is designed for you — but the fastest next step depends on *what you need to accomplish*. Pick your role and see the options that are most relevant.
+
+---
+
+### 👩‍💻 I'm a Developer
+
+You write PHP, work with Symfony, or build for eZ Publish / Exponential Platform. You want to ship faster, fix less, and build on a stack that stays alive.
+
+**What you can do:**
+
+| What | Where | Why it matters |
+|---|---|---|
+| **Sponsor 7x directly** | [github.com/sponsors/se7enxweb](https://github.com/sponsors/se7enxweb) | Fund monthly releases, security fixes, and PHP 8.5+ compat — the work that keeps your stack building |
+| **Sponsor the Exponential Foundation** | [github.com/sponsors/exponentialcms](https://github.com/sponsors/exponentialcms) | Fund the open-source project itself — core library maintenance, zetacomponents security, and community tools |
+| **Become a technology partner with Exponential Platform** | [exponential.earth](https://exponential.earth) | Get listed as a certified developer, access early release builds, and receive priority issue response |
+| **Partner with 7x directly** | [se7enx.com](https://se7enx.com) | White-label engagement, revenue share on referred projects, and access to 7x internal tooling |
+| **Buy: Build me a new Exponential Platform website** | [se7enx.com](https://se7enx.com) | We scope, architect, and build. You ship. Fixed-scope options available for immediate start. |
+| **Buy: Migrate my eZ Publish site to Exponential Platform** | [se7enx.com](https://se7enx.com) | Tested migration paths, LegacyBridge integration, content model audit, and deployment support |
+| **Buy: Upgrade my Exponential Platform installation** | [se7enx.com](https://se7enx.com) | PHP version upgrades, security patch application, bundle updates, and regression testing |
+
+---
+
+### ✍️ I'm a Content Editor
+
+You manage content, publish articles, run editorial workflows, and keep websites current. You want an administration interface that works the way you think.
+
+**What you can do:**
+
+| What | Where | Why it matters |
+|---|---|---|
+| **Sponsor the Exponential Foundation** | [github.com/sponsors/exponentialcms](https://github.com/sponsors/exponentialcms) | Your sponsorship directly funds improvements to the editorial UI, form builder, and workflow tools |
+| **Sponsor 7x** | [github.com/sponsors/se7enxweb](https://github.com/sponsors/se7enxweb) | Funds the NetgenAdminUIBundle, editorial toolchain maintenance, and the training book mirror |
+| **Partner with Exponential Platform** | [exponential.earth](https://exponential.earth) | Content strategy partnerships, editorial workflow consulting, and co-branded training |
+| **Buy: I need support for my existing website** | [se7enx.com](https://se7enx.com) | Editorial support contracts: content entry assistance, workflow troubleshooting, admin UI training |
+
+---
+
+### 🎨 I'm a Designer
+
+You build themes, front-ends, page layouts, and visual experiences on top of Exponential Platform. You want a design system that stays current and a layout engine that gives you real control.
+
+**What you can do:**
+
+| What | Where | Why it matters |
+|---|---|---|
+| **Sponsor 7x** | [github.com/sponsors/se7enxweb](https://github.com/sponsors/se7enxweb) | Funds the design engine, Twig template toolchain, and media-site reference implementation |
+| **Sponsor the Exponential Foundation** | [github.com/sponsors/exponentialcms](https://github.com/sponsors/exponentialcms) | Funds frontend tooling, the NG Layouts integration, and the media-site demo data |
+| **Become a design partner with Exponential Platform** | [exponential.earth](https://exponential.earth) | Get listed as a certified designer, receive design system assets, early access to UI bundles |
+| **Partner with 7x directly** | [se7enx.com](https://se7enx.com) | Co-design engagements, theme licensing, and revenue share for referred design projects |
+| **Buy: Redesign my Exponential Platform website** | [se7enx.com](https://se7enx.com) | Discovery, UX, front-end build, and deployment — on your platform, no migration required |
+
+---
+
+### 🏢 I'm a Business Owner / Decision Maker
+
+You run a website or digital product built on eZ Publish or Exponential Platform. You need it secure, fast, and well-supported — and you need results, not roadmaps.
+
+**The bottom line:** This is a 24-year-old platform maintained by a single North American company as free, open-source software. Every dollar of sponsorship or service revenue directly extends the platform's life and the quality of the tooling your site depends on.
+
+**What you can do:**
+
+| What | Where | Best for |
+|---|---|---|
+| **Sponsor 7x monthly** | [github.com/sponsors/se7enxweb](https://github.com/sponsors/se7enxweb) | Ensure the company maintaining your platform stays funded and focused |
+| **Sponsor the Exponential Foundation monthly** | [github.com/sponsors/exponentialcms](https://github.com/sponsors/exponentialcms) | Directly fund the open-source project your business depends on |
+| **Enterprise partner with Exponential Platform** | [exponential.earth](https://exponential.earth) | Visibility, co-marketing, priority support SLA, and influence on the roadmap |
+| **Enterprise partner with 7x** | [se7enx.com](https://se7enx.com) | Dedicated account management, SLA-backed support, and access to 7x internal tools and expertise |
+| **Buy: I want to build a new website on Exponential Platform** | [se7enx.com](https://se7enx.com) | Full project delivery — architecture, development, content modelling, launch |
+| **Buy: I need to migrate my site to Exponential Platform** | [se7enx.com](https://se7enx.com) | Safe, tested migration from eZ Publish or another CMS with minimal downtime |
+| **Buy: I need support for my existing website** | [se7enx.com](https://se7enx.com) | Incident response, maintenance contracts, update management, and editorial support |
+| **Buy: I need a redesign of my website** | [se7enx.com](https://se7enx.com) | New UX, new front-end, same content model — no data loss, no migration risk |
+| **Buy: I need an upgrade of my Exponential Platform installation** | [se7enx.com](https://se7enx.com) | PHP upgrade, bundle updates, security hardening, and regression testing — delivered |
+
+---
+
+## 💛 Sponsor us — keep this platform alive
+
+The Exponential Platform ecosystem is maintained by a small team. Every release, every security fix, and every PHP compatibility update is funded by the community. We have two sponsorship streams — one for the company, one for the open-source project. **Both matter. Both need your support.**
+
+### Sponsor 7x — the company that keeps the lights on
+
+**[github.com/sponsors/se7enxweb](https://github.com/sponsors/se7enxweb)**
+
+7x (se7enxweb) is the North American company that has maintained Exponential Platform since 2023 and has supported this ecosystem for 24+ years. Your sponsorship funds:
+
+- Monthly releases of **Exponential CMS 6.x** with PHP 8.x compatibility
+- Security patches across 47+ Zeta Components libraries
+- The **LegacyBridge** — keeping the full legacy ecosystem working on the modern stack
+- The **Symfony PHP 8.5+ fork** — the framework layer that everything runs on
+- The **database translator** — first-class PostgreSQL support
+- The **training book mirror** — 700+ pages of developer education, free forever
+
+> **Sponsor now → [github.com/sponsors/se7enxweb](https://github.com/sponsors/se7enxweb)**
+>
+> Monthly sponsors at any tier receive acknowledgment in release notes and priority responses on GitHub issues. Higher tiers receive direct access, partner listing, and influence on the roadmap.
+
+---
+
+### Sponsor the Exponential Foundation — the open-source project itself
+
+**[github.com/sponsors/exponentialcms](https://github.com/sponsors/exponentialcms)**
+
+The Exponential Foundation funds the open-source project: the core libraries, the documentation, the community tooling, and the long-term survival of the platform as free software. Your sponsorship funds:
+
+- **Core library maintenance** — `exponential`, `exponential-platform`, `exponential-platform-legacy`
+- **API documentation** at [api.exponential.earth](https://api.exponential.earth)
+- **Core documentation** at [doc.core.exponential.earth](https://doc.core.exponential.earth)
+- **GraphQL, REST, and Solr** — modern integration layers for headless and API-first builds
+- **Community infrastructure** — Slack, mirrors, wikis, and developer resources
+- **zetacomponents security hardening** — 14 upstream security PRs submitted in April 2026 alone
+
+> **Sponsor now → [github.com/sponsors/exponentialcms](https://github.com/sponsors/exponentialcms)**
+>
+> Foundation sponsors are listed in the project's CONTRIBUTORS file and on [exponential.earth](https://exponential.earth). Foundation sponsors at higher tiers receive roadmap input and co-marketing opportunities.
+
+---
+
+> 💡 **Can't sponsor monthly?** A one-time contribution at either link goes directly toward the work described above. Every dollar extends the runway. If your business runs on this platform, sponsorship is maintenance budget, not charity.
+
+---
+
 ## What we're doing right now
 
 ### Keeping Exponential Platform alive — past its EOL and into the PHP 9 era
