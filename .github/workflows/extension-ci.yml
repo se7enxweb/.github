@@ -103,7 +103,13 @@ jobs:
           fail=0
           while IFS= read -r f; do
             if ! out=$(php -d display_errors=1 -d error_reporting=E_ALL -l "$f" 2>&1); then
-              echo "::error file=$f::PHP $v: $(echo "$out" | grep -v '^Errors parsing' | head -1)"
+              msg=$(echo "$out" | grep -v '^Errors parsing' | head -1)
+              # An INI settings file is data behind "<?php /*"; a missing "*/" is reported, it is not PHP code
+              if [[ "$f" =~ \.ini(\.append)?\.php$ ]] && [[ "$msg" == *"Unterminated comment"* ]]; then
+                echo "::warning file=$f::PHP $v: INI settings file without the closing */ (add \"*/ ?>\" at its end)"
+                continue
+              fi
+              echo "::error file=$f::PHP $v: $msg"
               fail=$((fail+1))
             fi
           done < "$RUNNER_TEMP/files.txt"
