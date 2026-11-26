@@ -32,6 +32,7 @@ on PHP 8.0 through 8.5.
 | Run the modern stack and the legacy one together | [**exponential-platform-nexus**](https://github.com/se7enxweb/exponential-platform-nexus): Platform v2–v5 + Exponential 6 in one install |
 | Run the modern stack only | [**exponential-platform-dxp**](https://github.com/se7enxweb/exponential-platform-dxp) · [**exponential-platform-legacy**](https://github.com/se7enxweb/exponential-platform-legacy) |
 | Serve PHP faster, without Apache or FPM | [**exponential-velocity**](https://github.com/se7enxweb/exponential-velocity): a pure-PHP web server with persistent workers and static binaries |
+| Let AI assistants work on a site safely | [**tron**](https://github.com/se7enxweb/tron): the open MCP server layer of Exponential. Agents act as real users, with tokens, policies and an audit log · `composer require se7enxweb/tron` · [product page](https://se7enx.com/products/tron) |
 | Stop bots and scanners before PHP runs | [**exp_request_shield**](https://github.com/se7enxweb/exp_request_shield): a small web application firewall that decides every request |
 | Move an old eZ Publish site forward | [**LegacyBridge**](https://github.com/se7enxweb/LegacyBridge) · [hire us](https://se7enx.com) |
 | Learn the platform | [Docs](https://doc.exponential.earth) · [free training books](#free-training-books) |
@@ -44,7 +45,7 @@ on PHP 8.0 through 8.5.
 - [exponential](https://github.com/se7enxweb/exponential): the CMS kernel, admin and installers. Monthly releases, each
   tested on every supported PHP version.
 - [exponential-velocity](https://github.com/se7enxweb/exponential-velocity): the application server. Workers stay warm
-  between requests, it ships as a single static binary, and it runs Exponential without Apache or PHP-FPM.
+  between requests, it ships as a single static binary, and it runs Exponential without Apache or PHP-FPM. [Product page](https://se7enx.com/products/exponential-velocity).
 - [symfony](https://github.com/se7enxweb/symfony): our Symfony fork. The 3.x and 5.x branches are maintained here for
   current PHP, after upstream moved on.
 - [LegacyBridge](https://github.com/se7enxweb/LegacyBridge): runs legacy extensions and templates next to the Symfony
@@ -52,9 +53,12 @@ on PHP 8.0 through 8.5.
 
 **Building sites**
 - [explayouts](https://github.com/se7enxweb/explayouts) (Exponential Layouts): layouts, zones, blocks and rules, edited
-  visually by editors instead of in templates.
+  visually by editors instead of in templates. [Product page](https://se7enx.com/products/exponential-layouts).
 - [expai](https://github.com/se7enxweb/expai) (Exponential Intelligence): AI-assisted writing and content creation
-  inside the editor, with the provider you choose.
+  inside the editor, with the provider you choose. [Product page](https://se7enx.com/products/exponential-intelligence).
+- [tron](https://github.com/se7enxweb/tron): the open MCP server layer of Exponential. An AI agent works in your
+  installation as one of its real users, under that user's roles and policies, with its own token, an audit log and an
+  activity journal. [Product page](https://se7enx.com/products/tron).
 - [media-site](https://github.com/se7enxweb/media-site) · [media-site-legacy](https://github.com/se7enxweb/media-site-legacy):
   a complete reference site, with content model, theme and layouts, to start from.
 
