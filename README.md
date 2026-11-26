@@ -38,7 +38,8 @@ PHP 7.4 and 8.0-8.5 that `require.php` in the repository's `composer.json` admit
 when it states none), `xmllint` on `extension.xml`, a parity check of the version in
 `ezinfo.php`, `extension.xml` and a `version` in `composer.json`, and PHPUnit when the
 repository has a PHPUnit configuration and `phpunit/phpunit` in `require-dev`. Inputs:
-`php-versions` (override the list), `test-command` (run after the lint on every version, for
+`php-versions` (override the list), `phpunit: true` (PHPUnit with the repository's own
+configuration on every version, in the release setup-php picks for that PHP), `test-command` (run after the lint on every version, for
 tests that need no kernel) and `lint-exclude` (paths not to lint).
 
 ## More information

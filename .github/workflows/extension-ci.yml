@@ -17,7 +17,8 @@
 # What it checks, in one job so a repository costs one runner:
 #   - php -l on every tracked PHP file, on each of PHP 7.4 and 8.0-8.5 that the
 #     package's composer.json "require.php" admits (all of them when it states none)
-#   - an optional test command on each of those versions (input test-command)
+#   - optional tests on each of those versions: PHPUnit with the repository's own
+#     configuration (input phpunit: true) and a test command (input test-command)
 #   - xmllint of extension.xml
 #   - ezinfo.php 'Version', extension.xml <metadata><version> and a composer.json
 #     "version" agree (placeholders such as //autogentag// are reported, not failed)
@@ -36,6 +37,10 @@ on:
         description: A command run after the lint on every PHP version (for tests that need no kernel)
         type: string
         default: ''
+      phpunit:
+        description: Run PHPUnit (the version setup-php picks for each PHP) with the repository's configuration on every PHP version; for tests that need no kernel
+        type: boolean
+        default: false
       lint-exclude:
         description: Extended regular expression of paths not to lint (vendor/ and node_modules/ are always skipped)
         type: string
@@ -106,63 +111,96 @@ jobs:
           [ "$fail" -eq 0 ]
           SH
           chmod +x "$RUNNER_TEMP/lint.sh"
+          cat > "$RUNNER_TEMP/tests.sh" <<'SH'
+          #!/usr/bin/env bash
+          # The repository's own tests on this PHP: PHPUnit (input phpunit) and the test command (input test-command).
+          set -eu
+          if [ "${PHPUNIT:-false}" = true ]; then
+            cfg=$(ls phpunit.xml phpunit.xml.dist 2>/dev/null | head -1)
+            phpunit --version
+            phpunit ${cfg:+-c "$cfg"}
+          fi
+          if [ -n "${TEST_COMMAND:-}" ]; then bash -c "$TEST_COMMAND"; fi
+          SH
+          chmod +x "$RUNNER_TEMP/tests.sh"
 
       # One step per version keeps the whole check in one job (one runner per repository).
       - if: contains(steps.versions.outputs.list, ' 7.4 ')
         uses: shivammathur/setup-php@v2
-        with: { php-version: '7.4', coverage: none, tools: none }
+        with:
+          php-version: '7.4'
+          coverage: none
+          tools: ${{ inputs.phpunit && 'phpunit' || 'none' }}
       - name: PHP 7.4 syntax and tests
         if: contains(steps.versions.outputs.list, ' 7.4 ')
-        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}' }
-        run: '"$RUNNER_TEMP/lint.sh" && { [ -z "$TEST_COMMAND" ] || bash -c "$TEST_COMMAND"; }'
+        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}', PHPUNIT: '${{ inputs.phpunit }}' }
+        run: '"$RUNNER_TEMP/lint.sh" && "$RUNNER_TEMP/tests.sh"'
 
       - if: always() && contains(steps.versions.outputs.list, ' 8.0 ')
         uses: shivammathur/setup-php@v2
-        with: { php-version: '8.0', coverage: none, tools: none }
+        with:
+          php-version: '8.0'
+          coverage: none
+          tools: ${{ inputs.phpunit && 'phpunit' || 'none' }}
       - name: PHP 8.0 syntax and tests
         if: always() && contains(steps.versions.outputs.list, ' 8.0 ')
-        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}' }
-        run: '"$RUNNER_TEMP/lint.sh" && { [ -z "$TEST_COMMAND" ] || bash -c "$TEST_COMMAND"; }'
+        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}', PHPUNIT: '${{ inputs.phpunit }}' }
+        run: '"$RUNNER_TEMP/lint.sh" && "$RUNNER_TEMP/tests.sh"'
 
       - if: always() && contains(steps.versions.outputs.list, ' 8.1 ')
         uses: shivammathur/setup-php@v2
-        with: { php-version: '8.1', coverage: none, tools: none }
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: ${{ inputs.phpunit && 'phpunit' || 'none' }}
       - name: PHP 8.1 syntax and tests
         if: always() && contains(steps.versions.outputs.list, ' 8.1 ')
-        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}' }
-        run: '"$RUNNER_TEMP/lint.sh" && { [ -z "$TEST_COMMAND" ] || bash -c "$TEST_COMMAND"; }'
+        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}', PHPUNIT: '${{ inputs.phpunit }}' }
+        run: '"$RUNNER_TEMP/lint.sh" && "$RUNNER_TEMP/tests.sh"'
 
       - if: always() && contains(steps.versions.outputs.list, ' 8.2 ')
         uses: shivammathur/setup-php@v2
-        with: { php-version: '8.2', coverage: none, tools: none }
+        with:
+          php-version: '8.2'
+          coverage: none
+          tools: ${{ inputs.phpunit && 'phpunit' || 'none' }}
       - name: PHP 8.2 syntax and tests
         if: always() && contains(steps.versions.outputs.list, ' 8.2 ')
-        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}' }
-        run: '"$RUNNER_TEMP/lint.sh" && { [ -z "$TEST_COMMAND" ] || bash -c "$TEST_COMMAND"; }'
+        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}', PHPUNIT: '${{ inputs.phpunit }}' }
+        run: '"$RUNNER_TEMP/lint.sh" && "$RUNNER_TEMP/tests.sh"'
 
       - if: always() && contains(steps.versions.outputs.list, ' 8.3 ')
         uses: shivammathur/setup-php@v2
-        with: { php-version: '8.3', coverage: none, tools: none }
+        with:
+          php-version: '8.3'
+          coverage: none
+          tools: ${{ inputs.phpunit && 'phpunit' || 'none' }}
       - name: PHP 8.3 syntax and tests
         if: always() && contains(steps.versions.outputs.list, ' 8.3 ')
-        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}' }
-        run: '"$RUNNER_TEMP/lint.sh" && { [ -z "$TEST_COMMAND" ] || bash -c "$TEST_COMMAND"; }'
+        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}', PHPUNIT: '${{ inputs.phpunit }}' }
+        run: '"$RUNNER_TEMP/lint.sh" && "$RUNNER_TEMP/tests.sh"'
 
       - if: always() && contains(steps.versions.outputs.list, ' 8.4 ')
         uses: shivammathur/setup-php@v2
-        with: { php-version: '8.4', coverage: none, tools: none }
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: ${{ inputs.phpunit && 'phpunit' || 'none' }}
       - name: PHP 8.4 syntax and tests
         if: always() && contains(steps.versions.outputs.list, ' 8.4 ')
-        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}' }
-        run: '"$RUNNER_TEMP/lint.sh" && { [ -z "$TEST_COMMAND" ] || bash -c "$TEST_COMMAND"; }'
+        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}', PHPUNIT: '${{ inputs.phpunit }}' }
+        run: '"$RUNNER_TEMP/lint.sh" && "$RUNNER_TEMP/tests.sh"'
 
       - if: always() && contains(steps.versions.outputs.list, ' 8.5 ')
         uses: shivammathur/setup-php@v2
-        with: { php-version: '8.5', coverage: none, tools: none }
+        with:
+          php-version: '8.5'
+          coverage: none
+          tools: ${{ inputs.phpunit && 'phpunit' || 'none' }}
       - name: PHP 8.5 syntax and tests
         if: always() && contains(steps.versions.outputs.list, ' 8.5 ')
-        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}' }
-        run: '"$RUNNER_TEMP/lint.sh" && { [ -z "$TEST_COMMAND" ] || bash -c "$TEST_COMMAND"; }'
+        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}', PHPUNIT: '${{ inputs.phpunit }}' }
+        run: '"$RUNNER_TEMP/lint.sh" && "$RUNNER_TEMP/tests.sh"'
 
       - name: xmllint extension.xml
         if: always() && hashFiles('extension.xml') != ''
@@ -214,7 +252,7 @@ jobs:
           php "$RUNNER_TEMP/parity.php"
 
       - name: PHPUnit (repository with its own PHPUnit)
-        if: always() && (hashFiles('phpunit.xml', 'phpunit.xml.dist') != '')
+        if: always() && !inputs.phpunit && (hashFiles('phpunit.xml', 'phpunit.xml.dist') != '')
         run: |
           if ! php -r 'exit(isset(json_decode(@file_get_contents("composer.json"), true)["require-dev"]["phpunit/phpunit"]) ? 0 : 1);'; then
             echo "PHPUnit configuration found but phpunit/phpunit is not in require-dev: the tests run with the kernel, skipped here"
