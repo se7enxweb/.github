@@ -41,6 +41,10 @@ on:
         description: Run PHPUnit (the version setup-php picks for each PHP) with the repository's configuration on every PHP version; for tests that need no kernel
         type: boolean
         default: false
+      lint-exclude-php74:
+        description: Extended regular expression of paths not to lint on PHP 7.4 only (files a package loads on PHP 8.0 and later only, beside a PHP 7.4 build of them)
+        type: string
+        default: ''
       lint-exclude:
         description: Extended regular expression of paths not to lint (vendor/ and node_modules/ are always skipped)
         type: string
@@ -98,7 +102,8 @@ jobs:
           set -u
           v=$(php -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;')
           git ls-files -z '*.php' | tr '\0' '\n' | grep -Ev '^(vendor|node_modules)/' \
-            | { if [ -n "${EXCLUDE:-}" ]; then grep -Ev "$EXCLUDE"; else cat; fi; } > "$RUNNER_TEMP/files.txt"
+            | { if [ -n "${EXCLUDE:-}" ]; then grep -Ev "$EXCLUDE"; else cat; fi; } \
+            | { if [ "$v" = 7.4 ] && [ -n "${EXCLUDE74:-}" ]; then grep -Ev "$EXCLUDE74"; else cat; fi; } > "$RUNNER_TEMP/files.txt"
           n=$(wc -l < "$RUNNER_TEMP/files.txt")
           fail=0
           while IFS= read -r f; do
@@ -139,7 +144,7 @@ jobs:
           tools: ${{ inputs.phpunit && 'phpunit' || 'none' }}
       - name: PHP 7.4 syntax and tests
         if: contains(steps.versions.outputs.list, ' 7.4 ')
-        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}', PHPUNIT: '${{ inputs.phpunit }}' }
+        env: { EXCLUDE: '${{ inputs.lint-exclude }}', EXCLUDE74: '${{ inputs.lint-exclude-php74 }}', TEST_COMMAND: '${{ inputs.test-command }}', PHPUNIT: '${{ inputs.phpunit }}' }
         run: '"$RUNNER_TEMP/lint.sh" && "$RUNNER_TEMP/tests.sh"'
 
       - if: always() && contains(steps.versions.outputs.list, ' 8.0 ')
@@ -150,7 +155,7 @@ jobs:
           tools: ${{ inputs.phpunit && 'phpunit' || 'none' }}
       - name: PHP 8.0 syntax and tests
         if: always() && contains(steps.versions.outputs.list, ' 8.0 ')
-        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}', PHPUNIT: '${{ inputs.phpunit }}' }
+        env: { EXCLUDE: '${{ inputs.lint-exclude }}', EXCLUDE74: '${{ inputs.lint-exclude-php74 }}', TEST_COMMAND: '${{ inputs.test-command }}', PHPUNIT: '${{ inputs.phpunit }}' }
         run: '"$RUNNER_TEMP/lint.sh" && "$RUNNER_TEMP/tests.sh"'
 
       - if: always() && contains(steps.versions.outputs.list, ' 8.1 ')
@@ -161,7 +166,7 @@ jobs:
           tools: ${{ inputs.phpunit && 'phpunit' || 'none' }}
       - name: PHP 8.1 syntax and tests
         if: always() && contains(steps.versions.outputs.list, ' 8.1 ')
-        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}', PHPUNIT: '${{ inputs.phpunit }}' }
+        env: { EXCLUDE: '${{ inputs.lint-exclude }}', EXCLUDE74: '${{ inputs.lint-exclude-php74 }}', TEST_COMMAND: '${{ inputs.test-command }}', PHPUNIT: '${{ inputs.phpunit }}' }
         run: '"$RUNNER_TEMP/lint.sh" && "$RUNNER_TEMP/tests.sh"'
 
       - if: always() && contains(steps.versions.outputs.list, ' 8.2 ')
@@ -172,7 +177,7 @@ jobs:
           tools: ${{ inputs.phpunit && 'phpunit' || 'none' }}
       - name: PHP 8.2 syntax and tests
         if: always() && contains(steps.versions.outputs.list, ' 8.2 ')
-        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}', PHPUNIT: '${{ inputs.phpunit }}' }
+        env: { EXCLUDE: '${{ inputs.lint-exclude }}', EXCLUDE74: '${{ inputs.lint-exclude-php74 }}', TEST_COMMAND: '${{ inputs.test-command }}', PHPUNIT: '${{ inputs.phpunit }}' }
         run: '"$RUNNER_TEMP/lint.sh" && "$RUNNER_TEMP/tests.sh"'
 
       - if: always() && contains(steps.versions.outputs.list, ' 8.3 ')
@@ -183,7 +188,7 @@ jobs:
           tools: ${{ inputs.phpunit && 'phpunit' || 'none' }}
       - name: PHP 8.3 syntax and tests
         if: always() && contains(steps.versions.outputs.list, ' 8.3 ')
-        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}', PHPUNIT: '${{ inputs.phpunit }}' }
+        env: { EXCLUDE: '${{ inputs.lint-exclude }}', EXCLUDE74: '${{ inputs.lint-exclude-php74 }}', TEST_COMMAND: '${{ inputs.test-command }}', PHPUNIT: '${{ inputs.phpunit }}' }
         run: '"$RUNNER_TEMP/lint.sh" && "$RUNNER_TEMP/tests.sh"'
 
       - if: always() && contains(steps.versions.outputs.list, ' 8.4 ')
@@ -194,7 +199,7 @@ jobs:
           tools: ${{ inputs.phpunit && 'phpunit' || 'none' }}
       - name: PHP 8.4 syntax and tests
         if: always() && contains(steps.versions.outputs.list, ' 8.4 ')
-        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}', PHPUNIT: '${{ inputs.phpunit }}' }
+        env: { EXCLUDE: '${{ inputs.lint-exclude }}', EXCLUDE74: '${{ inputs.lint-exclude-php74 }}', TEST_COMMAND: '${{ inputs.test-command }}', PHPUNIT: '${{ inputs.phpunit }}' }
         run: '"$RUNNER_TEMP/lint.sh" && "$RUNNER_TEMP/tests.sh"'
 
       - if: always() && contains(steps.versions.outputs.list, ' 8.5 ')
@@ -205,7 +210,7 @@ jobs:
           tools: ${{ inputs.phpunit && 'phpunit' || 'none' }}
       - name: PHP 8.5 syntax and tests
         if: always() && contains(steps.versions.outputs.list, ' 8.5 ')
-        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}', PHPUNIT: '${{ inputs.phpunit }}' }
+        env: { EXCLUDE: '${{ inputs.lint-exclude }}', EXCLUDE74: '${{ inputs.lint-exclude-php74 }}', TEST_COMMAND: '${{ inputs.test-command }}', PHPUNIT: '${{ inputs.phpunit }}' }
         run: '"$RUNNER_TEMP/lint.sh" && "$RUNNER_TEMP/tests.sh"'
 
       - name: xmllint extension.xml

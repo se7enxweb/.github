@@ -40,7 +40,8 @@ when it states none), `xmllint` on `extension.xml`, a parity check of the versio
 repository has a PHPUnit configuration and `phpunit/phpunit` in `require-dev`. Inputs:
 `php-versions` (override the list), `phpunit: true` (PHPUnit with the repository's own
 configuration on every version, in the release setup-php picks for that PHP), `test-command` (run after the lint on every version, for
-tests that need no kernel) and `lint-exclude` (paths not to lint).
+tests that need no kernel) and `lint-exclude` (paths not to lint) and `lint-exclude-php74` (paths not to lint on PHP 7.4
+only: files a package loads on PHP 8.0 and later beside a PHP 7.4 build of them).
 
 ## More information
 
