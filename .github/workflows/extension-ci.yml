@@ -176,12 +176,23 @@ jobs:
           cat > "$RUNNER_TEMP/parity.php" <<'PHP'
           <?php
           // Reads the version fields a release moves together and compares the ones that hold a number.
+          // Same parsing as xsh git:version-parity: a string, or the class constant / define() it names.
           $found = array();
-          if (is_file('ezinfo.php') && preg_match("/['\"]Version['\"]\s*=>\s*['\"]([^'\"]*)['\"]/", file_get_contents('ezinfo.php'), $m)) {
-              $found['ezinfo.php'] = $m[1];
+          if (is_file('ezinfo.php')) {
+              $php = file_get_contents('ezinfo.php');
+              if (preg_match("/['\"]Version['\"]\s*=>\s*(?:['\"]([^'\"]*)['\"]|(?:self|static|\w+)::(\w+)|(\w+))/", $php, $m)) {
+                  $name = isset($m[2]) && $m[2] !== '' ? $m[2] : (isset($m[3]) ? $m[3] : '');
+                  if ($name === '') { $found['ezinfo.php'] = trim($m[1]); }
+                  elseif (preg_match('/const\s+' . preg_quote($name, '/') . "\s*=\s*['\"]([^'\"]*)['\"]/", $php, $c)
+                      || preg_match("/define\(\s*['\"]" . preg_quote($name, '/') . "['\"]\s*,\s*['\"]([^'\"]*)['\"]/", $php, $c)) { $found['ezinfo.php'] = trim($c[1]); }
+                  else { $found['ezinfo.php'] = $name; }
+              }
           }
-          if (is_file('extension.xml') && preg_match('#<metadata>.*?<version>\s*([^<]*?)\s*</version>#s', file_get_contents('extension.xml'), $m)) {
-              $found['extension.xml'] = $m[1];
+          if (is_file('extension.xml')) {
+              // <metadata><version>, else the extension's own <version> (not one of software/uses/dependencies)
+              $xml = file_get_contents('extension.xml');
+              if (preg_match('#<metadata>.*?<version>\s*([^<]*?)\s*</version>#s', $xml, $m)) { $found['extension.xml'] = $m[1]; }
+              elseif (preg_match('#<extension\b.*?<version>\s*([^<]*?)\s*</version>#s', preg_replace('#<(software|uses|dependencies|requires)\b.*?</\1>#s', '', $xml), $m)) { $found['extension.xml'] = $m[1]; }
           }
           if (is_file('composer.json')) {
               $j = json_decode(file_get_contents('composer.json'), true);
