@@ -1,0 +1,7 @@
+{
+  "name": "Exponential extension CI",
+  "description": "php -l on PHP 7.4 and 8.0-8.5 as composer.json admits, xmllint extension.xml, version parity of ezinfo.php, extension.xml and composer.json, PHPUnit when the repository has its own.",
+  "iconName": "php",
+  "categories": ["PHP"],
+  "filePatterns": ["extension.xml$", "ezinfo.php$"]
+}

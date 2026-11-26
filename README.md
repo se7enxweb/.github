@@ -19,6 +19,27 @@ These files apply automatically to every repository in the `se7enxweb` organisat
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute code, issues and documentation |
 | [SECURITY.md](SECURITY.md) | How to report security vulnerabilities |
 | [SUPPORT.md](SUPPORT.md) | Where to get help |
+| [.github/workflows/extension-ci.yml](.github/workflows/extension-ci.yml) | Shared CI for extension repositories (reusable workflow) |
+| [workflow-templates/extension-ci.yml](workflow-templates/extension-ci.yml) | The caller an extension repository adds as its own `.github/workflows/ci.yml` |
+
+## Shared CI for extension repositories
+
+Every extension repository runs the same checks through one reusable workflow. Its own
+`.github/workflows/ci.yml` is the short caller in `workflow-templates/extension-ci.yml`:
+
+```yaml
+jobs:
+  extension:
+    uses: se7enxweb/.github/.github/workflows/extension-ci.yml@main
+```
+
+In one job (one runner per repository) it runs `php -l` on every tracked PHP file on each of
+PHP 7.4 and 8.0-8.5 that `require.php` in the repository's `composer.json` admits (all of them
+when it states none), `xmllint` on `extension.xml`, a parity check of the version in
+`ezinfo.php`, `extension.xml` and a `version` in `composer.json`, and PHPUnit when the
+repository has a PHPUnit configuration and `phpunit/phpunit` in `require-dev`. Inputs:
+`php-versions` (override the list), `test-command` (run after the lint on every version, for
+tests that need no kernel) and `lint-exclude` (paths not to lint).
 
 ## More information
 

@@ -1,0 +1,213 @@
+# Shared CI for Exponential extension repositories.
+#
+# A repository calls it with a short workflow of its own:
+#
+#   name: CI
+#   on:
+#     push:
+#       branches: [main, master]
+#     pull_request:
+#     workflow_dispatch:
+#   permissions:
+#     contents: read
+#   jobs:
+#     extension:
+#       uses: se7enxweb/.github/.github/workflows/extension-ci.yml@main
+#
+# What it checks, in one job so a repository costs one runner:
+#   - php -l on every tracked PHP file, on each of PHP 7.4 and 8.0-8.5 that the
+#     package's composer.json "require.php" admits (all of them when it states none)
+#   - an optional test command on each of those versions (input test-command)
+#   - xmllint of extension.xml
+#   - ezinfo.php 'Version', extension.xml <metadata><version> and a composer.json
+#     "version" agree (placeholders such as //autogentag// are reported, not failed)
+#   - PHPUnit, when the repository has a PHPUnit configuration and requires
+#     phpunit/phpunit in require-dev (it can then run without the kernel)
+name: Extension CI
+
+on:
+  workflow_call:
+    inputs:
+      php-versions:
+        description: Space separated PHP versions to lint, instead of the ones composer.json admits
+        type: string
+        default: ''
+      test-command:
+        description: A command run after the lint on every PHP version (for tests that need no kernel)
+        type: string
+        default: ''
+      lint-exclude:
+        description: Extended regular expression of paths not to lint (vendor/ and node_modules/ are always skipped)
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  extension:
+    name: Lint, metadata and tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: PHP versions the package admits
+        id: versions
+        env:
+          OVERRIDE: ${{ inputs.php-versions }}
+        run: |
+          if [ -n "$OVERRIDE" ]; then
+            list=" $OVERRIDE "
+          else
+            mkdir -p "$RUNNER_TEMP/semver"
+            composer require --quiet --no-interaction --working-dir="$RUNNER_TEMP/semver" composer/semver:^3
+            cat > "$RUNNER_TEMP/versions.php" <<'PHP'
+          <?php
+          require getenv('RUNNER_TEMP') . '/semver/vendor/autoload.php';
+          $json = is_file('composer.json') ? json_decode(file_get_contents('composer.json'), true) : array();
+          $constraint = isset($json['require']['php']) ? trim($json['require']['php']) : '';
+          $all = array('7.4', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5');
+          $out = array();
+          foreach ($all as $v) {
+              if ($constraint === '') { $out[] = $v; continue; }
+              foreach (array('.0', '.30', '.99') as $patch) {
+                  if (\Composer\Semver\Semver::satisfies($v . $patch, $constraint)) { $out[] = $v; break; }
+              }
+          }
+          fwrite(STDERR, 'require.php: ' . ($constraint === '' ? '(none)' : $constraint) . "\n");
+          echo implode(' ', $out);
+          PHP
+            list=" $(php "$RUNNER_TEMP/versions.php") "
+          fi
+          echo "PHP versions:$list"
+          if [ "$list" = "  " ]; then echo "::error::composer.json require.php admits none of PHP 7.4, 8.0-8.5"; exit 1; fi
+          echo "list=$list" >> "$GITHUB_OUTPUT"
+
+      - name: Write the lint script
+        env:
+          EXCLUDE: ${{ inputs.lint-exclude }}
+        run: |
+          cat > "$RUNNER_TEMP/lint.sh" <<'SH'
+          #!/usr/bin/env bash
+          # php -l on every tracked PHP file; prints each failure as an annotation.
+          set -u
+          v=$(php -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;')
+          git ls-files -z '*.php' | tr '\0' '\n' | grep -Ev '^(vendor|node_modules)/' \
+            | { if [ -n "${EXCLUDE:-}" ]; then grep -Ev "$EXCLUDE"; else cat; fi; } > "$RUNNER_TEMP/files.txt"
+          n=$(wc -l < "$RUNNER_TEMP/files.txt")
+          fail=0
+          while IFS= read -r f; do
+            if ! out=$(php -d display_errors=1 -d error_reporting=E_ALL -l "$f" 2>&1); then
+              echo "::error file=$f::PHP $v: $(echo "$out" | grep -v '^Errors parsing' | head -1)"
+              fail=$((fail+1))
+            fi
+          done < "$RUNNER_TEMP/files.txt"
+          echo "PHP $v: $n files, $fail with syntax errors"
+          [ "$fail" -eq 0 ]
+          SH
+          chmod +x "$RUNNER_TEMP/lint.sh"
+
+      # One step per version keeps the whole check in one job (one runner per repository).
+      - if: contains(steps.versions.outputs.list, ' 7.4 ')
+        uses: shivammathur/setup-php@v2
+        with: { php-version: '7.4', coverage: none, tools: none }
+      - name: PHP 7.4 syntax and tests
+        if: contains(steps.versions.outputs.list, ' 7.4 ')
+        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}' }
+        run: '"$RUNNER_TEMP/lint.sh" && { [ -z "$TEST_COMMAND" ] || bash -c "$TEST_COMMAND"; }'
+
+      - if: always() && contains(steps.versions.outputs.list, ' 8.0 ')
+        uses: shivammathur/setup-php@v2
+        with: { php-version: '8.0', coverage: none, tools: none }
+      - name: PHP 8.0 syntax and tests
+        if: always() && contains(steps.versions.outputs.list, ' 8.0 ')
+        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}' }
+        run: '"$RUNNER_TEMP/lint.sh" && { [ -z "$TEST_COMMAND" ] || bash -c "$TEST_COMMAND"; }'
+
+      - if: always() && contains(steps.versions.outputs.list, ' 8.1 ')
+        uses: shivammathur/setup-php@v2
+        with: { php-version: '8.1', coverage: none, tools: none }
+      - name: PHP 8.1 syntax and tests
+        if: always() && contains(steps.versions.outputs.list, ' 8.1 ')
+        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}' }
+        run: '"$RUNNER_TEMP/lint.sh" && { [ -z "$TEST_COMMAND" ] || bash -c "$TEST_COMMAND"; }'
+
+      - if: always() && contains(steps.versions.outputs.list, ' 8.2 ')
+        uses: shivammathur/setup-php@v2
+        with: { php-version: '8.2', coverage: none, tools: none }
+      - name: PHP 8.2 syntax and tests
+        if: always() && contains(steps.versions.outputs.list, ' 8.2 ')
+        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}' }
+        run: '"$RUNNER_TEMP/lint.sh" && { [ -z "$TEST_COMMAND" ] || bash -c "$TEST_COMMAND"; }'
+
+      - if: always() && contains(steps.versions.outputs.list, ' 8.3 ')
+        uses: shivammathur/setup-php@v2
+        with: { php-version: '8.3', coverage: none, tools: none }
+      - name: PHP 8.3 syntax and tests
+        if: always() && contains(steps.versions.outputs.list, ' 8.3 ')
+        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}' }
+        run: '"$RUNNER_TEMP/lint.sh" && { [ -z "$TEST_COMMAND" ] || bash -c "$TEST_COMMAND"; }'
+
+      - if: always() && contains(steps.versions.outputs.list, ' 8.4 ')
+        uses: shivammathur/setup-php@v2
+        with: { php-version: '8.4', coverage: none, tools: none }
+      - name: PHP 8.4 syntax and tests
+        if: always() && contains(steps.versions.outputs.list, ' 8.4 ')
+        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}' }
+        run: '"$RUNNER_TEMP/lint.sh" && { [ -z "$TEST_COMMAND" ] || bash -c "$TEST_COMMAND"; }'
+
+      - if: always() && contains(steps.versions.outputs.list, ' 8.5 ')
+        uses: shivammathur/setup-php@v2
+        with: { php-version: '8.5', coverage: none, tools: none }
+      - name: PHP 8.5 syntax and tests
+        if: always() && contains(steps.versions.outputs.list, ' 8.5 ')
+        env: { EXCLUDE: '${{ inputs.lint-exclude }}', TEST_COMMAND: '${{ inputs.test-command }}' }
+        run: '"$RUNNER_TEMP/lint.sh" && { [ -z "$TEST_COMMAND" ] || bash -c "$TEST_COMMAND"; }'
+
+      - name: xmllint extension.xml
+        if: always() && hashFiles('extension.xml') != ''
+        run: |
+          command -v xmllint > /dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq libxml2-utils > /dev/null; }
+          xmllint --noout extension.xml && echo "extension.xml is well formed"
+
+      - name: ezinfo.php, extension.xml and composer.json state the same version
+        if: always()
+        run: |
+          cat > "$RUNNER_TEMP/parity.php" <<'PHP'
+          <?php
+          // Reads the version fields a release moves together and compares the ones that hold a number.
+          $found = array();
+          if (is_file('ezinfo.php') && preg_match("/['\"]Version['\"]\s*=>\s*['\"]([^'\"]*)['\"]/", file_get_contents('ezinfo.php'), $m)) {
+              $found['ezinfo.php'] = $m[1];
+          }
+          if (is_file('extension.xml') && preg_match('#<metadata>.*?<version>\s*([^<]*?)\s*</version>#s', file_get_contents('extension.xml'), $m)) {
+              $found['extension.xml'] = $m[1];
+          }
+          if (is_file('composer.json')) {
+              $j = json_decode(file_get_contents('composer.json'), true);
+              if (isset($j['version'])) { $found['composer.json'] = (string) $j['version']; }
+          }
+          $numbers = array();
+          foreach ($found as $file => $v) {
+              echo "$file: $v\n";
+              $n = ltrim($v, 'vV');
+              if (preg_match('/^\d+(\.\d+)*$/', $n)) { $numbers[$file] = $n; }
+              else { echo "::warning file=$file::version field is not a release number: $v\n"; }
+          }
+          if (count(array_unique($numbers)) > 1) {
+              echo "::error::version fields differ: " . json_encode($numbers) . "\n";
+              exit(1);
+          }
+          echo $numbers ? "PASS: " . reset($numbers) . "\n" : "no numeric version field to compare\n";
+          PHP
+          php "$RUNNER_TEMP/parity.php"
+
+      - name: PHPUnit (repository with its own PHPUnit)
+        if: always() && (hashFiles('phpunit.xml', 'phpunit.xml.dist') != '')
+        run: |
+          if ! php -r 'exit(isset(json_decode(@file_get_contents("composer.json"), true)["require-dev"]["phpunit/phpunit"]) ? 0 : 1);'; then
+            echo "PHPUnit configuration found but phpunit/phpunit is not in require-dev: the tests run with the kernel, skipped here"
+            exit 0
+          fi
+          composer install --no-interaction --no-progress --prefer-dist
+          vendor/bin/phpunit
